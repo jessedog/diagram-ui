@@ -91,9 +91,10 @@ onMounted(() => {
   meta2d.on("inactive", inactive);
 
   meta2d.socketFn = (message, context) => {
+    console.log("socketFn", message);
     if (message) {
       let info = JSON.parse(message);
-      if (info.data["data"]) {
+      if (info.data && info.data["data"]) {
         let dataList = JSON.parse(info.data["data"]);
         console.table("数据返回", dataList);
         useCommonStoreWithOut().setVariableData(dataList);
