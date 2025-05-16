@@ -1,1 +1,1 @@
-# diagram-ui
+# 感谢[mind](https://github.com/opendidi/mind)的开源，此项目在此基础上进行开发
