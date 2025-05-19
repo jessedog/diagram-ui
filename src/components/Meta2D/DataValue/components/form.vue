@@ -29,7 +29,16 @@
         <a-input v-model:value="model.name" placeholder="请输入名称" />
       </a-form-item>
       <a-form-item label="属性名" name="key">
-        <a-input v-model:value="model.key" placeholder="请输入属性" />
+        <a-auto-complete
+          v-model:value="model.key"
+          placeholder="请输入属性"
+          :options="propOptions"
+          :filterOption="false"
+        >
+          <template #option="item">
+            <span>{{item.label}}</span>
+          </template>
+        </a-auto-complete>
       </a-form-item>
       <a-form-item label="类型" name="type">
         <a-select v-model:value="model.type" placeholder="请选择类型">
@@ -95,7 +104,7 @@
           <a-input-number v-model:value="model.precision" />
         </a-form-item>
       </template>
-      <a-form-item label="操作">
+      <a-form-item label="">
         <a-button type="primary" html-type="submit">确定</a-button>
       </a-form-item>
     </a-form>
@@ -127,6 +136,16 @@ export default defineComponent({
     let bodyStyle = ref({
       padding: "12px",
     });
+
+    const propOptions = ref([
+      { label: "文字", value: "text" },
+      { label: "颜色", value: "color" },
+      { label: "背景颜色", value: "background" },
+      { label: "显示", value: "visible" },
+      { label: "禁用", value: "disabled" },
+      { label: "值", value: "value" },
+      { label: "状态", value: "showChild" },
+    ]);
 
     watch(
       () => model.value.type,
@@ -180,6 +199,7 @@ export default defineComponent({
       rules,
       drawerStyle,
       bodyStyle,
+      propOptions,
       init,
       addOptions,
       onDelete,
