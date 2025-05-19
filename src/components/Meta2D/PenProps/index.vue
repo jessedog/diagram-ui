@@ -718,6 +718,7 @@ function onRefreshData(data: any) {
   Object.assign(pen.value, {
     ...data,
   });
+  localStorage.setItem("meta2d", JSON.stringify(meta2d.data()));
 }
 
 function getDataValue(k: any, v: any) {
