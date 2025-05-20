@@ -38,35 +38,50 @@
       </a-form>
     </a-collapse-panel>
     <a-collapse-panel :key="2" :forceRender="true" header="数据">
-      <a-form label-align="left" :label-col="{ span: 10 }" class="data-value-form">
+      <a-form label-align="left" :label-col="{ span: 8 }" class="data-value-form">
         <template v-if="pen.form !== undefined && pen.form.length !== 0">
           <template v-for="(vo, idx) in pen.form" :key="idx">
             <a-form-item :label="vo.name">
               <div class="flex items-center justify-between">
-                <template v-if="vo.type == 'text'">
-                  <a-input v-model:value="pen[vo.key]" @change="getDataValue(vo.key, pen[vo.key])" style="width: 100%" />
-                </template>
-                <template v-else-if="vo.type == 'number'">
-                  <a-input-number v-model:value="pen[vo.key]" style="flex: 1" @change="getDataValue(vo.key, pen[vo.key])" />
-                </template>
-                <template v-else-if="vo.type == 'switch'">
-                  <a-switch v-model:checked="pen[vo.key]" />
-                </template>
-                <template v-else-if="vo.type == 'code'">
-                  <a-button size="small" @click="openEditContainer(vo, idx)">...</a-button>
-                </template>
-                <template v-else-if="vo.type == 'slider'">
-                  <a-slider
-                    v-model:value="pen[vo.key]"
-                    :min="vo.min"
-                    :max="vo.max"
-                    :step="vo.step"
-                    @change="getDataValue(vo.key, pen[vo.key])"
-                    style="flex: 1"
-                  />
-                </template>
-                <div class="flex variable" style="flex: 1">
+                <div style="width: 60%">
+                  <template v-if="vo.type == 'text'">
+                    <a-input v-model:value="pen[vo.key]" @change="getDataValue(vo.key, pen[vo.key])" style="width: 100%" />
+                  </template>
+                  <template v-else-if="vo.type == 'number'">
+                    <a-input-number v-model:value="pen[vo.key]" style="flex: 1" @change="getDataValue(vo.key, pen[vo.key])" />
+                  </template>
+                  <template v-else-if="vo.type == 'switch'">
+                    <a-switch v-model:checked="pen[vo.key]" />
+                  </template>
+                  <template v-else-if="vo.type == 'color'">
+                    <t-color-picker
+                      style="width: 100%"
+                      :size="large"
+                      v-model="pen[vo.key]"
+                      :show-primary-color-preview="false"
+                      :format="HEX"
+                      :color-modes="['monochrome']"
+                      @update:modelValue="getDataValue(vo.key, pen[vo.key])"
+                      clearable
+                    />
+                  </template>
+                  <template v-else-if="vo.type == 'code'">
+                    <a-button size="small" @click="openEditContainer(vo, idx)">...</a-button>
+                  </template>
+                  <template v-else-if="vo.type == 'slider'">
+                    <a-slider
+                      v-model:value="pen[vo.key]"
+                      :min="vo.min"
+                      :max="vo.max"
+                      :step="vo.step"
+                      @change="getDataValue(vo.key, pen[vo.key])"
+                      style="flex: 1"
+                    />
+                  </template>
+                </div>
+                <div class="flex variable" style="flex: 0">
                   <LinkOutlined title="绑定变量" @click="openVariable(vo, idx)" />
+                  <EditOutlined title="编辑" @click="onDeleteData(vo, idx)" />
                   <DeleteOutlined title="删除" @click="onDeleteData(vo, idx)" />
                 </div>
               </div>
@@ -233,6 +248,7 @@ export default defineComponent({
 
     function getDataValue(k, v) {
       emit('getDataValue', k, v);
+      console.log('getDataValue', k, v);
     }
 
     /**

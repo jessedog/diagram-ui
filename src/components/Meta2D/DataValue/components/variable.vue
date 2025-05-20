@@ -18,7 +18,7 @@
     @cancel="handleCancel"
   >
     <div class="m-4">
-      <!-- <div class="flex items-center">
+      <div class="flex items-center">
         <span>当前绑定：</span>
         <span>{{ model.dataId }}</span>
         <template v-if="model.dataId !== ''">
@@ -31,17 +31,17 @@
         <template v-else>
           <span>无</span>
         </template>
-      </div> -->
+      </div>
       <a-form ref="form" :model="model">
-        <!-- <a-form-item name="dataId">
+        <a-form-item name="dataId">
           <a-input v-model:value="model.dataId" placeholder="Search">
             <template #suffix>
               <search-outlined />
             </template>
           </a-input>
-        </a-form-item> -->
+        </a-form-item>
         <a-form-item>
-          <a-radio-group v-model:value="model.dataId" name="radioGroup">
+          <!-- <a-radio-group v-model:value="model.dataId" name="radioGroup">
             <a-row :gutter="5">
               <template v-for="(item, idx) in treeData" :key="idx">
                 <a-col class="gutter-row" :span="6">
@@ -49,8 +49,8 @@
                 </a-col>
               </template>
             </a-row>
-          </a-radio-group>
-          <!-- <a-tree :tree-data="treeData" :fieldNames="fieldNames" @select="onSelect" /> -->
+          </a-radio-group> -->
+          <a-tree :tree-data="treeData" :fieldNames="fieldNames" @select="onSelect" />
         </a-form-item>
       </a-form>
     </div>
@@ -62,6 +62,7 @@ import { ref, defineComponent, onMounted } from 'vue';
 import { useCommonStoreWithOut } from '@/store/modules/common';
 import { DeleteOutlined, SearchOutlined } from '@ant-design/icons-vue';
 import { TREE_LIST as treeList } from './tree';
+import { findObjById } from '@/utils/common';
 export default defineComponent({
   components: { SearchOutlined, DeleteOutlined },
   setup(props, { emit }) {
@@ -71,8 +72,9 @@ export default defineComponent({
       name: '',
       dataId: '',
     });
-
     let treeData = ref([]);
+    treeData.value = treeList
+    console.log('treeData', treeData);
 
     let fieldNames = ref({
       key: 'id',
@@ -82,7 +84,9 @@ export default defineComponent({
 
     function handleOk() {
       visible.value = false;
-      let data = treeData.value.find((item) => item.id == model.value.dataId);
+      // let data = treeData.value.find((item) => item.id == model.value.dataId);
+      const data = findObjById(treeData.value, model.value.dataId, "children");
+      console.log('data', data);
       if (data) {
         emit('oks', {
           ...data,
@@ -104,7 +108,7 @@ export default defineComponent({
     };
 
     onMounted(() => {
-      treeData.value = useCommonStoreWithOut().variableData;
+      // treeData.value = useCommonStoreWithOut().variableData;
     });
 
     return {

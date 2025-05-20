@@ -210,6 +210,13 @@
                     clearable
                   />
                 </a-form-item>
+                <a-form-item label="阴影模糊">
+                  <a-input-number
+                    v-model:value="pen.shadowBlur"
+                    @change="changeValue('shadowBlur')"
+                    style="width: 100%"
+                  />
+                </a-form-item>
                 <a-form-item label="阴影颜色">
                   <t-color-picker
                     class="w-full"
@@ -217,7 +224,7 @@
                     :show-primary-color-preview="false"
                     format="CSS"
                     :color-modes="['monochrome']"
-                    @update:modelValue="changeValue('color')"
+                    @update:modelValue="changeValue('shadowColor')"
                     clearable
                   />
                 </a-form-item>
@@ -254,7 +261,7 @@
                 </a-form-item>
               </a-collapse-panel>
               <a-collapse-panel :key="3" :forceRender="true" header="文字">
-                <a-form-item label="字体名">
+                <a-form-item label="文本内容">
                   <a-input
                     v-model:value="pen.text"
                     @change="changeValue('text')"
@@ -672,7 +679,6 @@ watch(
 const lineDashs = [undefined, [5, 5]];
 
 function changeValue(prop: string) {
-  console.log(prop);
   const v: any = { id: pen.value.id };
   v[prop] = pen.value[prop];
   switch (prop) {
@@ -687,7 +693,6 @@ function changeValue(prop: string) {
     default:
       break;
   }
-  console.log(v);
   meta2d.setValue(v, { render: true });
 }
 
@@ -722,9 +727,11 @@ function onRefreshData(data: any) {
 }
 
 function getDataValue(k: any, v: any) {
-  Object.assign(pen.value, {
+  const propObj = {
     [k]: v,
-  });
+    "id": pen.value.id,
+  }
+  meta2d.setValue(propObj, { render: true });
 }
 
 function deleteDataValue(k: string) {
