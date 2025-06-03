@@ -21,6 +21,7 @@ import '@/assets/js/assets.le5lecdn.com_2d_canvas2svg.js'
 import '@/assets/js/marked.min.js'
 import '@/assets/js/font_4042197_vr5c62twlzh.js'
 
+import '@/styles/style.css';
 import '@/assets/icon/iconfont.css'
 import '@/styles/index.less';
 
