@@ -57,13 +57,13 @@
       </a>
     </div>
     <div class="head-center flex">
-      <a :class="[penStatus === 'pen' ? 'active' : '']" @click="onPenChange('pen')">
+      <a :class="[isOnDrawLine == true ? 'active' : '']" @click="onDrawLine">
         <t-icon name="pen" />
         <span>钢笔</span>
       </a>
       <a
-        :class="[penStatus === 'pencil' ? 'active' : '']"
-        @click="onPenChange('pencil')"
+        :class="[isDrawingPencil == true ? 'active' : '']"
+        @click="onDrawingPencil"
       >
         <t-icon name="edit" />
         <span>铅笔</span>
@@ -337,10 +337,6 @@ let isDisableAnchor = ref<boolean>(false);
 
 // 是否开启放大镜
 let isShowMagnifier = ref<boolean>(false);
-
-type penStatusType = "unused" | "pen" | "pencil";
-
-const penStatus = ref<penStatusType>("unused");
 
 const isDrawLine = ref<boolean>(false);
 
@@ -750,43 +746,31 @@ const onAddAnchorHand = () => meta2d.addAnchorHand();
 const onRemoveAnchorHand = () => meta2d.removeAnchorHand();
 
 /**
- * 绘制铅笔或钢笔线条
+ * 钢笔绘制线条
  */
-function onPenChange(status: penStatusType) {
-  if (penStatus.value === status) {
-    // 如果当前状态和传入的状态相同，则停止绘制
-    penStatus.value = "unused";
-    if (status === "pen"){
-      stopPen();
-    } else if (status === "pencil"){
-    stopPencil();
-    }
-    return;
-  }else if (status === "pen") {
-    stopPencil();
-    startPen();
-    penStatus.value = "pen";
-  } else if (status === "pencil") {
-    stopPen();
-    meta2d.drawingPencil();
-    penStatus.value = "pencil";
+function onDrawLine() {
+  if (!isOnDrawLine.value) {
+    // 开始绘画：curve。除了curve，还有polyline、line、mind
+    meta2d.drawLine("curve");
+    isOnDrawLine.value = true;
+  } else {
+    // 手动完成绘画
+    meta2d.finishDrawLine();
+    isOnDrawLine.value = false;
   }
 }
 
-function stopPencil() {
-  meta2d.finishPencil();
-  meta2d.stopPencil();
-}
-
-function stopPen() {
-  meta2d.finishDrawLine();
-  meta2d.drawLine();
-  meta2d.store.options.disableAnchor = false;
-}
-
-function startPen() {
-    meta2d.drawLine(meta2d.store.options.drawingLineName);
-    meta2d.store.options.disableAnchor = true;
+/**
+ * 绘制铅笔
+ */
+function onDrawingPencil() {
+  if (!isDrawingPencil.value) {
+    meta2d.drawingPencil();
+    isDrawingPencil.value = true;
+  } else {
+    meta2d.stopPencil();
+    isDrawingPencil.value = false;
+  }
 }
 
 /**
@@ -866,11 +850,6 @@ function onSearch() {
   z-index: 3;
 
   .head-center {
-    
-    .active{
-        color: #0c56eb;
-      }
-
     .iconfont {
       &::before {
         font-size: 20px;
@@ -880,7 +859,7 @@ function onSearch() {
         font-size: 14px;
       }
 
-      .active,
+      &.active,
       &:hover {
         color: #0c56eb;
       }

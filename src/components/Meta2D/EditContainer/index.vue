@@ -112,13 +112,13 @@ export default defineComponent({
 </script>
 
 <style lang="less" >
-.ant-modal-root .editor-modal {
-  .ant-modal-body {
-    padding: 0;
-    .code-editor {
-      width: 100%;
-      height: 80vh;
-    }
-  }
-}
+// .ant-modal-root .editor-modal {
+//   .ant-modal-body {
+//     padding: 0;
+//     .code-editor {
+//       width: 100%;
+//       height: 80vh;
+//     }
+//   }
+// }
 </style>

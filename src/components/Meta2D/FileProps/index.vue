@@ -275,6 +275,7 @@ let editContainerTitle = ref<string>();
  * 初始化数据
  */
 function onInit(dataValue) {
+  console.log(dataValue);
   const d: any = dataValue; //JSON.parse(useCommonStore().originalData);
 
   if (d['https']) {
@@ -463,8 +464,22 @@ function onDeleteHttpNode(data: any, idx: number) {
  * https://doc.le5le.com/document/119620524#MQTT
  */
 function onMqttDataFinish() {
+  console.log('mqttForm', mqttForm);
   // 连接新配置
   meta2d.connectMqtt(mqttForm);
+
+  // 当发生错误时，打印错误信息
+  meta2d.mqttClient.on('error', (error) => {
+    console.error('[mqtt] Error:', error);
+  });
+
+  meta2d.mqttClient.on('connect', (message) => {
+    console.log('[mqtt] connect', message);
+  });
+
+  meta2d.mqttClient.on('disconnect', (message) => {
+    console.log('[mqtt] disconnect', message);
+  });
 }
 
 defineExpose({

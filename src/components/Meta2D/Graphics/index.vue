@@ -6,6 +6,14 @@
       :tabBarGutter="12"
       :centered="true"
     >
+      <a-tab-pane key="0" tab="图纸" force-render>
+        <folderList
+          type='DRAWING'
+          @ok="handleNewDirectory"
+          :folderList="drawingFolderList"
+        />
+      </a-tab-pane>
+
       <a-tab-pane key="1" tab="系统组件">
         <div class="p-3">
           <a-input
@@ -109,46 +117,28 @@
         </div>
       </a-tab-pane>
       <a-tab-pane key="2" tab="我的组件" force-render>
-        <div class="mkdir-head" @click="directoryVisible = true">
-          <folder-add-outlined />
-          <span>新建文件夹</span>
-        </div>
-        <div class="">
-          <a-collapse
-            v-model:activeKey="directoryKey"
-            :defaultExpandAll="true"
-            expand-icon-position="right"
-            accordion
-            ghost
-            :destroyInactivePanel="true"
-          >
-            <template v-for="(vo, idx) in directoryList" :key="idx">
-              <a-collapse-panel :forceRender="true">
-                <template #header>
-                  <span>{{ vo.name }}</span>
-                </template>
-              </a-collapse-panel>
-            </template>
-          </a-collapse>
-        </div>
+        <folderList
+          type='COMPONENT'
+          @ok="handleNewDirectory"
+          :folderList="compnentFolderList"
+        />
       </a-tab-pane>
     </a-tabs>
-    <MoreModal ref="moreModal" @oks="heandleGraphicGroups" />
+    <MoreModal ref="moreModal" @oks="handleGraphicGroups" />
+    <NewDirectoryModal ref="newDirectoryModal" @ok="handleNewDirectory"/>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, watch, nextTick, onMounted, getCurrentInstance } from "vue";
-import {
-  FolderOutlined,
-  FolderOpenOutlined,
-  FolderAddOutlined,
-  AppstoreOutlined,
-} from "@ant-design/icons-vue";
-import { GRAPHIC_GROUPS as graphicGroups } from "@/utils/graphicGroups.ts";
+import { ref, watch, nextTick, getCurrentInstance, computed } from "vue";
+import { createFolder, getAllFolderList } from "@/api/folder"
+import { GRAPHIC_GROUPS as graphicGroups } from "@/utils/graphicGroups";
 import MoreModal from "./components/more-modal.vue";
+import NewDirectoryModal from "./components/newDirectorymodal.vue";
+import FolderList from "./components/folerList.vue";
 import { useCommonStore } from "@/store/modules/common";
 import { Icon } from "tdesign-icons-vue-next";
+import { DrawingType } from "@/components/types";
 
 // 原数据
 let originalGraphicGroups = graphicGroups;
@@ -157,7 +147,7 @@ let graphicGroupsList = ref(graphicGroups);
 
 let { proxy } = getCurrentInstance();
 
-let tabsActiveKey = ref("1");
+let tabsActiveKey = ref("0");
 
 let activeKey = ref(0);
 
@@ -174,6 +164,13 @@ let directoryKey = ref("");
 
 // 过滤值
 let keyword = ref("");
+
+const compnentFolderList = computed(() => {
+  return directoryList.value.filter((item: any) => item.type === "COMPONENT");
+});
+const drawingFolderList = computed(() => {
+  return directoryList.value.filter((item: any) => item.type === "DRAWING");
+});
 
 watch(
   () => directoryVisible.value,
@@ -208,19 +205,34 @@ function openGraphics() {
 }
 
 /**
- * 获取文件夹名称
+ * 增文件夹名称
  */
-function handleOk() {
-  directoryList.value.push({
-    name: directoryName.value,
+function handleNewDirectory(type: DrawingType, dirName: string) {
+  createFolder(dirName, type)
+  .then(() => {
+    proxy.$message.success("新建文件夹成功");
+    getFolderList();
+  })
+  .catch((err) => {
+    proxy.$message.error(err.message || "新建文件夹失败");
   });
-  directoryVisible.value = false;
+}
+
+function getFolderList() {
+  getAllFolderList()
+    .then((res) => {
+      directoryList.value = res.data;
+      directoryKey.value = res.data.map((item: any) => item.id);
+    })
+    .catch((err) => {
+      proxy.$message.error(err.message || "获取文件夹列表失败");
+    });
 }
 
 /**
  * 显示/隐藏回调后处理左侧栏是否显示或者隐藏
  */
-function heandleGraphicGroups() {
+function handleGraphicGroups() {
   let graphicsKey = useCommonStore().graphics;
   let keys = Object.keys(graphicsKey);
   let array: any = [];
@@ -278,7 +290,8 @@ function filterGraphicGroups() {
   }
 }
 
-heandleGraphicGroups();
+getFolderList()
+handleGraphicGroups();
 </script>
 
 <style lang="less" scoped>
@@ -295,6 +308,8 @@ heandleGraphicGroups();
 
     .mkdir-head {
       margin: 12px;
+      display: flex;
+      align-items: center;
 
       .anticon {
         margin: 0 6px 0 0;
