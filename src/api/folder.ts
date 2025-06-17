@@ -31,3 +31,6 @@ export async function createFolder(name: string, type: DrawingType) {
   })
 }
 
+export async function deleteFolder(id: string) {
+  return await http.delete(`${API.base}/${id}`)
+}

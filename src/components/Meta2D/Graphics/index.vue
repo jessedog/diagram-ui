@@ -10,6 +10,8 @@
         <folderList
           type='DRAWING'
           @ok="handleNewDirectory"
+          @addDrawing="handleAddDrawing"
+          @deleteFolder="handleDeleteFolder"
           :folderList="drawingFolderList"
         />
       </a-tab-pane>
@@ -121,6 +123,8 @@
           type='COMPONENT'
           @ok="handleNewDirectory"
           :folderList="compnentFolderList"
+          @addDrawing="handleAddDrawing"
+          @deleteFolder="handleDeleteFolder"
         />
       </a-tab-pane>
     </a-tabs>
@@ -131,7 +135,7 @@
 
 <script lang="ts" setup>
 import { ref, watch, nextTick, getCurrentInstance, computed } from "vue";
-import { createFolder, getAllFolderList } from "@/api/folder"
+import { createFolder, getAllFolderList, deleteFolder } from "@/api/folder"
 import { GRAPHIC_GROUPS as graphicGroups } from "@/utils/graphicGroups";
 import MoreModal from "./components/more-modal.vue";
 import NewDirectoryModal from "./components/newDirectorymodal.vue";
@@ -216,6 +220,26 @@ function handleNewDirectory(type: DrawingType, dirName: string) {
   .catch((err) => {
     proxy.$message.error(err.message || "新建文件夹失败");
   });
+}
+
+function handleAddDrawing(type: DrawingType, vo: any) {
+  console.log("handleAddDrawing", type, vo);
+  if (type === "COMPONENT") {
+  } else if (type === "DRAWING") {
+    meta2d.open({ name: "新建项目", pens: [] } as any);
+  }
+}
+
+function handleDeleteFolder(type: DrawingType, vo: any) {
+  console.log("handleDeleteFolder", type, vo);
+  deleteFolder(vo.id)
+    .then(() => {
+      proxy.$message.success("删除文件夹成功");
+      getFolderList();
+    })
+    .catch((err) => {
+      proxy.$message.error(err.message || "删除文件夹失败");
+    });
 }
 
 function getFolderList() {
@@ -345,6 +369,8 @@ handleGraphicGroups();
     border-top: none;
     .ant-collapse-item {
       .ant-collapse-header {
+        display: flex;
+        align-items: center;
         span {
         }
         .group-name {

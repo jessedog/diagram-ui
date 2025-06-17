@@ -8,12 +8,12 @@
         </a>
         <template #overlay>
           <a-menu>
-            <!-- <a-menu-item @click="newFile">
+            <a-menu-item @click="newFile">
               <a>新建文件</a>
-            </a-menu-item> -->
-            <!-- <a-menu-item @click="openFile" divider="true">
+            </a-menu-item>
+            <a-menu-item @click="openFile" divider="true">
               <a>打开文件</a>
-            </a-menu-item> -->
+            </a-menu-item>
             <a-menu-item divider="true">
               <a @click="downloadJson">下载JSON文件</a>
             </a-menu-item>
